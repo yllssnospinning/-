@@ -1,24 +1,49 @@
-class Accounts:
-    def __init__(self, baseCurrency):
-        self.baseCurrency = baseCurrency
-        self.marketValues = {self.baseCurrency : 1}
+class accounts:
+    def __init__(self):
         self.accounts = {}
     
-    def getMarketValue(self, assets):
-        totalValue = 0
-        for i in assets:
-            if i in self.marketValues and not i == self.baseCurrency:
-                totalValue += assets[i] * self.marketValues[i]['quantity']
-        return totalValue
-
-    def getBuyingPower(self, username):
-        assets = self.fetchUserAssets(username, 'openOrders')
-        fiatHolding = self.fetchUserAssets(username, 'fiat')   
-        openOrdersValue = self.getMarketValue(assets)
-        buyingPower = fiatHolding - openOrdersValue
-        return buyingPower
+    def createAccount(self, accountName, startingCapital):
+        if not accountName in self.accounts:
+            # Create account with initial balance
+            account = {'fiat':float(startingCapital), 'pos':{}, 'openOrder':{}}
+            self.accounts[accountName] = account
     
-    def fetchUserAssets(self, username, type):
-        if username in self.accounts:
-            assets = self.accounts[username][type]
-            return assets
+    def getHolding(self, accountName, assetName):
+        if accountName in self.accounts:
+            account = self.accounts[accountName]
+            if assetName == 'fiat':
+                return account['fiat']
+            else:
+                holdings = account['pos']
+                if assetName in holdings:
+                    return holdings[assetName]
+                else:
+                    return 0
+    
+    def editAssets(self, accountName, assetName, qty):
+        if accountName in self.accounts:
+            account = self.accounts[accountName]
+            if assetName == 'fiat':
+                asset = account['fiat']
+                asset += qty
+            else:
+                if assetName in account['pos']:
+                    asset = account['pos'][assetName]
+                    asset += qty
+                else:
+                    if qty >= 0:
+                        account['pos'][assetName] = qty
+    
+    def transact(self, buyer, seller, assetName, qty, price):
+        if buyer in self.accounts and seller in self.accounts:
+            # Buyer pays fiat while seller pays in asset
+            sellerHolding = self.getHolding(seller, assetName)
+            # Check if seller has enough assets to transact
+            if sellerHolding >= qty:
+                amountPayable = qty * price
+                buyerCash = self.getHolding(buyer, 'fiat')
+                if buyerCash >= amountPayable:
+                    self.accounts[buyer]['fiat'] += -1 * amountPayable
+                    self.accounts[buyer]['pos']
+                    self.accounts[seller]['']
+            
