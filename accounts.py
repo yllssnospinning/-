@@ -43,7 +43,8 @@ class accounts:
                 amountPayable = qty * price
                 buyerCash = self.getHolding(buyer, 'fiat')
                 if buyerCash >= amountPayable:
-                    self.accounts[buyer]['fiat'] += -1 * amountPayable
-                    self.accounts[buyer]['pos']
-                    self.accounts[seller]['']
-            
+                    self.editAssets(self, buyer, 'fiat', -1 * amountPayable)
+                    self.editAssets(self, buyer, assetName, qty)
+                    self.editAssets(self, seller, 'fiat', 1 * amountPayable)
+                    self.editAssets(self, seller, assetName, -1 * qty)
+    
